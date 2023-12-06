@@ -1,13 +1,13 @@
 version: '3'
 services:
   airplay:
-    image: issogr/airplay-audio
-    restart: always
+    build: ./airplay
     network_mode: host
+    restart: unless-stopped
     devices:
-      - /dev/snd
+      - "/dev/snd" # ALSA device
     environment:
-      - AIRPLAY_NAME=NicoAudioReceiver
+       - AIRPLAY_NAME=${DEVICE_NAME}
 
   pulseaudio-bluetooth:
     restart: always
@@ -21,9 +21,7 @@ services:
       - NET_ADMIN
     volumes:
       - /etc/localtime:/etc/locialtime:ro
-      - ./bluetooth:/var/lib/bluetooth
+      - ./.storage/bluetooth:/var/lib/bluetooth
     environment:
-      - PIN=000000
-      - NAME=NicoAudioReceiver
-      - DEVICE=8C:88:2B:60:3D:15
-      - DEVICE_PIN=0000
+      - NAME=${DEVICE_NAME}
+      - DEVICE=${BLUETOOTH_MAC}
