@@ -8,6 +8,10 @@ services:
       - "/dev/snd" # ALSA device
     environment:
        - AIRPLAY_NAME=${DEVICE_NAME}
+    volumes:
+      - ./.storage/airplay:/session
+    env_file:
+      - .env
 
   pulseaudio-bluetooth:
     restart: always
@@ -25,3 +29,17 @@ services:
     environment:
       - NAME=${DEVICE_NAME}
       - DEVICE=${BLUETOOTH_MAC}
+
+  api:
+    restart: always
+    build: ./api
+    volumes:
+      - ./.storage:/storage
+      - cache:/.cache
+    ports:
+      - ${API_PORT}:${API_PORT}
+    env_file:
+      - .env
+
+volumes:
+  cache:
