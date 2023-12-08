@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "prepare-docker": "rimraf .cache/* && mkdir .cache/artwork",
+    "prepare-docker": "rimraf .cache/* && mkdir .cache/artworks",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

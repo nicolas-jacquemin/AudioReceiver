@@ -29,20 +29,24 @@ export class AirplayService {
     });
 
     pipeReader.on('PICT', async (pict: string) => {
+      this.data.PICT = this.getTrackChecksum();
+
       const buf = Buffer.from(pict, 'base64');
       try {
         const image = new Artwork(buf);
         const imageSize = await image.getSize();
         const imageFormat = await image.getFormat();
-        const imagePath = `${this.getTrackChecksum()}.${imageFormat.toLocaleLowerCase()}`;
-        image.saveToFile(`${this.cachePath}/artwork/${imagePath}`);
+        const imagePath = `artwork-${this.getTrackChecksum()}.${imageFormat.toLocaleLowerCase()}`;
+        image.saveToFile(`${this.cachePath}/artworks/${imagePath}`);
 
         this.metadata.artwork = {
-          url: `cache/artwork/${imagePath}`,
+          url: `cache/artworks/${imagePath}`,
           meta: {
             dimensions: imageSize,
           }
         }
+
+        this.updateEvent('artworkInfos', this.metadata.artwork);
       } catch (_e) {
         console.error(`cannot save image`, _e);
       }
@@ -101,7 +105,9 @@ export class AirplayService {
   }
 
   private getTrackChecksum = () => {
-    return crypto.createHash('md5').update(`${this.metadata.track?.artist}-${this.metadata.track?.title}`).digest('base64url');
+    if (this.metadata.track)
+      return crypto.createHash('md5').update(`${this.metadata.track?.artist}-${this.metadata.track?.title}`).digest('base64url');
+    return ""
   }
 
   private data: AirplayData = {};
@@ -122,16 +128,21 @@ export class AirplayService {
     }
   }
 
+  public getArtwork = () => {
+    if (this.data.PICT === "" || this.data.PICT === this.getTrackChecksum())
+      return this.metadata.artwork;
+    return false;
+  }
 
-  public getTrack = () => ({
-    ...this.metadata.track,
-    artwork: this.metadata.artwork
-  });
+  public getTrack = () => this.metadata.track;
+
   public getSession = () => this.metadata.session;
+
 
   public getSummary = () => ({
     track: this.getTrack(),
     session: this.getSession(),
+    artwork: this.getArtwork(),
     type: 'Airplay'
   });
 

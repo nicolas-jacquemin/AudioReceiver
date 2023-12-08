@@ -64,6 +64,7 @@ export interface AirplayMetadata {
 
 export interface AirplayEvents {
   trackInfos?: [(...args: any) => void];
+  artworkInfos?: [(...args: any) => void];
   sessionInfo?: [(...args: any) => void];
   play?: [(...args: any) => void];
   pause?: [(...args: any) => void];
